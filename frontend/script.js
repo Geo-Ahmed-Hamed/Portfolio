@@ -127,7 +127,10 @@ contactForm.addEventListener('submit', async (e) => {
         console.log('Sending form data:', { name, email, subject, message });
         
         // Send data to backend API
-        const response = await fetch('http://localhost:3000/api/contact', {
+        const apiUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api/contact' 
+            : '/.netlify/functions/api';
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

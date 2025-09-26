@@ -1,77 +1,121 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const { body, validationResult } = require('express-validator');
+// Netlify serverless function for contact form
+exports.handler = async (event, context) => {
+  // Enable CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
 
-const app = express();
-
-// CORS configuration for Netlify
-app.use(cors({
-  origin: ['https://your-site-name.netlify.app', 'http://localhost:8080'],
-  credentials: true
-}));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
-  message: {
-    error: 'Too many contact form submissions from this IP, please try again later.'
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
-});
 
-app.use(limiter);
-app.use(helmet());
-app.use(express.json({ limit: '10mb' }));
-
-// Validation rules
-const contactValidation = [
-  body('name').trim().isLength({ min: 2, max: 50 }).withMessage('Name must be between 2 and 50 characters'),
-  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email address'),
-  body('subject').trim().isLength({ min: 5, max: 100 }).withMessage('Subject must be between 5 and 100 characters'),
-  body('message').trim().isLength({ min: 10, max: 1000 }).withMessage('Message must be between 10 and 1000 characters')
-];
-
-// Contact form endpoint
-app.post('/contact', contactValidation, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
+  // Only allow POST requests
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
+        message: 'Method not allowed'
+      })
+    };
+  }
+
+  try {
+    // Parse request body
+    const { name, email, subject, message } = JSON.parse(event.body || '{}');
+
+    // Basic validation
+    if (!name || !email || !subject || !message) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'All fields are required'
+        })
+      };
     }
 
-    const { name, email, subject, message } = req.body;
+    if (name.length < 2 || name.length > 50) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Name must be between 2 and 50 characters'
+        })
+      };
+    }
 
-    // For Netlify, you can use their email service or external service
-    // This is a simplified version - you'll need to implement email sending
+    if (subject.length < 5 || subject.length > 100) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Subject must be between 5 and 100 characters'
+        })
+      };
+    }
+
+    if (message.length < 10 || message.length > 1000) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Message must be between 10 and 1000 characters'
+        })
+      };
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Please provide a valid email address'
+        })
+      };
+    }
+
+    // Log the submission (you can integrate with email service here)
     console.log(`Contact form submission from: ${name} (${email})`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Message: ${message}`);
 
-    res.json({
-      success: true,
-      message: 'Thank you for your message! I will get back to you soon.'
-    });
+    // For now, just return success
+    // You can integrate with email services like SendGrid, Mailgun, or Netlify Forms
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: 'Thank you for your message! I will get back to you soon.'
+      })
+    };
 
   } catch (error) {
     console.error('Contact form error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error. Please try again later.'
-    });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        message: 'Internal server error. Please try again later.'
+      })
+    };
   }
-});
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    service: 'Portfolio API'
-  });
-});
-
-module.exports = app;
+};
