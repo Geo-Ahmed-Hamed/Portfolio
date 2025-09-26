@@ -26,7 +26,12 @@ const limiter = rateLimit({
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:8080', 'http://127.0.0.1:8080'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:8080', 
+    'http://127.0.0.1:8080',
+    'https://wonderful-truffle-e3838a.netlify.app'
+  ],
   credentials: true
 }));
 
