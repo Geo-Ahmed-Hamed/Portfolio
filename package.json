@@ -1,0 +1,32 @@
+{
+  "name": "portfolio-website",
+  "version": "1.0.0",
+  "description": "Full-stack portfolio website with Node.js backend for email functionality",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "install-backend": "cd backend && npm install",
+    "install-all": "npm run install-backend",
+    "frontend": "cd frontend && python -m http.server 8080",
+    "setup": "npm run install-all && echo 'Setup complete! Configure your .env file in the backend folder.'"
+  },
+  "keywords": [
+    "portfolio",
+    "website",
+    "nodejs",
+    "express",
+    "email",
+    "frontend",
+    "backend"
+  ],
+  "author": "Ahmed Mohamed Hamed",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahmedmohamedhamed/portfolio-website.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
