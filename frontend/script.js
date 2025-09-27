@@ -86,7 +86,7 @@ const observer = new IntersectionObserver((entries) => {
 
 // Add fade-in class to elements and observe them
 document.addEventListener('DOMContentLoaded', () => {
-    const elementsToAnimate = document.querySelectorAll('.project-card, .skill-category, .stat, .about-text, .about-image');
+    const elementsToAnimate = document.querySelectorAll('.project-card, .skill-category, .stat, .about-text, .about-image, .timeline-item');
     
     elementsToAnimate.forEach(element => {
         element.classList.add('fade-in');
@@ -344,6 +344,92 @@ document.addEventListener('DOMContentLoaded', () => {
     stats.forEach(stat => statsObserver.observe(stat));
 });
 
+// Timeline animations
+document.addEventListener('DOMContentLoaded', () => {
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    
+    // Create intersection observer for timeline items
+    const timelineObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const timelineItem = entry.target;
+                const marker = timelineItem.querySelector('.timeline-marker');
+                const content = timelineItem.querySelector('.timeline-content');
+                
+                // Animate marker
+                setTimeout(() => {
+                    marker.style.transform = 'translateX(-50%) scale(1)';
+                    marker.style.opacity = '1';
+                }, 200);
+                
+                // Animate content
+                setTimeout(() => {
+                    content.style.transform = 'translateY(0)';
+                    content.style.opacity = '1';
+                }, 400);
+                
+                // Animate achievements list
+                const achievements = timelineItem.querySelectorAll('.timeline-achievements li');
+                achievements.forEach((achievement, index) => {
+                    setTimeout(() => {
+                        achievement.style.transform = 'translateX(0)';
+                        achievement.style.opacity = '1';
+                    }, 600 + (index * 100));
+                });
+                
+                // Animate tech tags
+                const techTags = timelineItem.querySelectorAll('.timeline-tech span');
+                techTags.forEach((tag, index) => {
+                    setTimeout(() => {
+                        tag.style.transform = 'translateY(0)';
+                        tag.style.opacity = '1';
+                    }, 800 + (index * 50));
+                });
+                
+                timelineObserver.unobserve(timelineItem);
+            }
+        });
+    }, { threshold: 0.3 });
+    
+    // Initialize timeline items with hidden state
+    timelineItems.forEach(item => {
+        const marker = item.querySelector('.timeline-marker');
+        const content = item.querySelector('.timeline-content');
+        const achievements = item.querySelectorAll('.timeline-achievements li');
+        const techTags = item.querySelectorAll('.timeline-tech span');
+        
+        // Set initial hidden state
+        marker.style.transform = 'translateX(-50%) scale(0)';
+        marker.style.opacity = '0';
+        content.style.transform = 'translateY(30px)';
+        content.style.opacity = '0';
+        
+        achievements.forEach(achievement => {
+            achievement.style.transform = 'translateX(-20px)';
+            achievement.style.opacity = '0';
+        });
+        
+        techTags.forEach(tag => {
+            tag.style.transform = 'translateY(20px)';
+            tag.style.opacity = '0';
+        });
+        
+        // Add transition styles
+        marker.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        content.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        achievements.forEach(achievement => {
+            achievement.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+        
+        techTags.forEach(tag => {
+            tag.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+        
+        timelineObserver.observe(item);
+    });
+});
+
 // Add loading animation
 window.addEventListener('load', () => {
     document.body.classList.add('loaded');
@@ -362,7 +448,7 @@ const loadingStyles = `
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #05445E 0%, #189AB4 50%, #75E6DA 100%);
         z-index: 10000;
         display: flex;
         align-items: center;
