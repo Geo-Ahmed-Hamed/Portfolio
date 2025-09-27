@@ -710,6 +710,17 @@ section {
     color: #1f2937;
 }
 
+.project-period {
+    color: #189AB4;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    background: #D4F1F4;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    display: inline-block;
+}
+
 .project-content p {
     color: #6b7280;
     margin-bottom: 1.5rem;
